@@ -1,0 +1,6 @@
+.idea/*
+functions/node_modules/*
+functions/.eslintrc.json
+*.ts
+*.log
+
