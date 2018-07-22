@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "actions-on-google": "^2.2.0",
+    "asyncawait": "^1.0.7",
     "firebase-admin": "~5.12.1",
-    "firebase-functions": "^1.0.3"
+    "firebase-functions": "^1.0.3",
+    "request": "^2.87.0",
+    "request-promise": "^4.2.2"
   },
   "devDependencies": {
     "eslint": "^4.12.0",
