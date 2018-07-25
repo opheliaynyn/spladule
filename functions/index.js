@@ -17,7 +17,6 @@ app.intent('Default Welcome Intent', conv => {
     'マッチ名かルール名を教えてください。');
 });
 
-
 var teach = async(function teach(conv, params, input) {
     // スケジュールを教えて終了
     var ret;
@@ -33,6 +32,7 @@ var teach = async(function teach(conv, params, input) {
             ret = await(getNowSchedule(params.MatchName));
             break;
     }
+    ret = bukiConversion(ret);
     conv.close(ret);
 });
 
@@ -236,9 +236,22 @@ function getNextSchedule(match){
     return retSchedule;
 }
 
-//ゼロサプレス
-function zeroSuppress( val ) {
+function zeroSuppress(val) {
     return val.replace( /^0+([0-9]+)/, "$1" );
+}
+
+function bukiConversion(val) {
+    var buki = {
+        'はてな': /？/g,
+        'ゴーニー': /\.52/g,
+        'キュウロク': /\.96/g,
+        'Nザップ': /N-ZAP/g,
+        'ゴーニーゴ': /525/g,
+    }
+    for (var key in buki) {
+        val = val.replace(buki[key], key);
+    }
+    return val;
 }
 
 exports.teach = functions.https.onRequest(app);
