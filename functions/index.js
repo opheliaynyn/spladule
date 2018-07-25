@@ -14,7 +14,7 @@ var await = require('asyncawait/await');
 app.intent('Default Welcome Intent', conv => {
     // メッセージを言って、ユーザの応答を待機
     conv.ask('スプラジュールです。スケジュールを確認したい、' +
-    'マッチ名かルール名を教えてください');
+    'マッチ名かルール名を教えてください。');
 });
 
 
@@ -122,11 +122,10 @@ var getNowSchedule = async(function (match) {
 
             retSchedule = '現在のサーモンランのステージは、'
             + ret.result[0].stage.name + 'です。終了は、'
-            + ret.result[0].end.slice(0, 4) + '年'
             + zeroSuppress(ret.result[0].end.slice(5, 7)) + '月'
             + zeroSuppress(ret.result[0].end.slice(8, 10)) + '日'
             + zeroSuppress(ret.result[0].end.slice(11, 13))
-            + '時までです。支給ブキは、';
+            + '時です。支給ブキは、';
             for (var i = 0; i < 4; i++) {
                 retSchedule += ret.result[0].weapons[i].name + '、';
             }
@@ -175,21 +174,21 @@ function getNextSchedule(match){
             retSchedule = '次のナワバリバトルのステージは、'
             + ret.result[0].maps_ex[0].name + 'と'
             + ret.result[0].maps_ex[1].name
-            + 'です。開始は、' + ret.result[0].start(11, 13) + '時からです。';
+            + 'です。開始は、' + ret.result[0].start.slice(11, 13) + '時です。';
             break;
         case 'ガチマッチ':
             retSchedule = '次のガチマッチのルールは'
             + ret.result[0].rule + 'で、ステージは、'
             + ret.result[0].maps_ex[0].name + 'と'
             + ret.result[0].maps_ex[1].name
-            + 'です。開始は、' + ret.result[0].start(11, 13) + '時からです。';
+            + 'です。開始は、' + ret.result[0].start.slice(11, 13) + '時です。';
             break;
         case 'リーグマッチ':
             retSchedule = '次のリーグマッチのルールは'
              + ret.result[0].rule + 'で、ステージは、'
             + ret.result[0].maps_ex[0].name + 'と'
              + ret.result[0].maps_ex[1].name
-            + 'です。開始は、' + ret.result[0].start(11, 13) + '時からです。';
+            + 'です。開始は、' + ret.result[0].start.slice(11, 13) + '時です。';
             break;
         case 'ガチエリア':
         case 'ガチホコ':
@@ -200,11 +199,11 @@ function getNextSchedule(match){
                     retSchedule = '次の' + match + 'のステージは、'
                     + ret.result[i].maps_ex[0].name + 'と'
                     + ret.result[i].maps_ex[1].name
-                    + 'です。開始は、' + ret.result[i].start.slice(0, 4) + '年'
+                    + 'です。開始は、'
                     + zeroSuppress(ret.result[i].start.slice(5, 7)) + '月'
                     + zeroSuppress(ret.result[i].start.slice(8, 10)) + '日'
                     + zeroSuppress(ret.result[i].start.slice(11, 13))
-                    + '時からです。';
+                    + '時です。';
                     break;
                 }
             }
@@ -222,11 +221,10 @@ function getNextSchedule(match){
 
             retSchedule = '次のサーモンランのステージは、'
             + ret.result[index].stage.name + 'です。開始は、'
-            + ret.result[index].start.slice(0, 4) + '年'
             + zeroSuppress(ret.result[index].start.slice(5, 7)) + '月'
             + zeroSuppress(ret.result[index].start.slice(8, 10)) + '日'
             + zeroSuppress(ret.result[index].start.slice(11, 13))
-            + '時からです。支給ブキは、';
+            + '時です。支給ブキは、';
             for (var i = 0; i < 4; i++) {
                 retSchedule += ret.result[index].weapons[i].name + '、';
             }
