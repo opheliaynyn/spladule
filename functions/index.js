@@ -15,7 +15,7 @@ app.intent('Default Welcome Intent', conv => {
     // メッセージを言って、ユーザの応答を待機
     conv.ask('スプラジュールです。スケジュールを確認したい、' +
     'マッチ名かルール名を教えてください。');
-});
+})
 
 var teach = async(function teach(conv, params, input) {
     // スケジュールを教えて終了
@@ -38,22 +38,10 @@ var teach = async(function teach(conv, params, input) {
 
 app.intent('Teach Schedule', teach);
 
-// format: 書式フォーマット
-var formatDate = function (date, format) {
-    format = format.replace(/YYYY/g, date.getFullYear());
-    format = format.replace(/MM/g, ('0' + (date.getMonth() + 1)).slice(-2));
-    format = format.replace(/DD/g, ('0' + date.getDate()).slice(-2));
-    format = format.replace(/HH/g, ('0' + date.getHours()).slice(-2));
-    format = format.replace(/mm/g, ('0' + date.getMinutes()).slice(-2));
-    format = format.replace(/ss/g, ('0' + date.getSeconds()).slice(-2));
-    format = format.replace(/SSS/g, ('00' + date.getMilliseconds()).slice(-3));
-    return format;
-};
-
 function doRequest(options) {
     return new Promise(function (resolve, reject) {
         request(options, function (error, res, body) {
-            if (!error && res.statusCode == 200) {
+            if (!error && res.statusCode === 200) {
                 resolve(body);
             } else {
                 reject(error);
@@ -87,51 +75,56 @@ var getNowSchedule = async(function (match) {
         method: 'GET',
     };
 
-    let ret = JSON.parse(await(doRequest(options)));
-    switch (match) {
-        case 'ナワバリバトル':
-            retSchedule = '現在のナワバリバトルのステージは、'
-            + ret.result[0].maps_ex[0].name + 'と'
-            + ret.result[0].maps_ex[1].name
-            + 'です。終了は、' + zeroSuppress(ret.result[0].end.slice(11, 13))
-            + '時です。';
-            break;
-        case 'ガチマッチ':
-            retSchedule = '現在のガチマッチのルールは'
-            + ret.result[0].rule + 'で、ステージは、'
-            + ret.result[0].maps_ex[0].name + 'と'
-            + ret.result[0].maps_ex[1].name
-            + 'です。終了は、' + zeroSuppress(ret.result[0].end.slice(11, 13))
-            + '時です。';
-            break;
-        case 'リーグマッチ':
-            retSchedule = '現在のリーグマッチのルールは'
-            + ret.result[0].rule + 'で、ステージは、'
-            + ret.result[0].maps_ex[0].name + 'と'
-            + ret.result[0].maps_ex[1].name
-            + 'です。終了は、' + zeroSuppress(ret.result[0].end.slice(11, 13))
-            + '時です。';
-            break;
-        case 'サーモンラン':
-            var start = ret.result[0].start;
-            var end = ret.result[0].end;
-            if (!(start <= now && now <= end)) {
-                retSchedule = '現在、サーモンランは行われていません。';
+    try{
+        let ret = JSON.parse(await(doRequest(options)));
+        switch (match) {
+            case 'ナワバリバトル':
+                retSchedule = '現在のナワバリバトルのステージは、'
+                + ret.result[0].maps_ex[0].name + 'と'
+                + ret.result[0].maps_ex[1].name
+                + 'です。終了は、' + zeroSuppress(ret.result[0].end.slice(11, 13))
+                + '時です。';
                 break;
-            }
+            case 'ガチマッチ':
+                retSchedule = '現在のガチマッチのルールは'
+                + ret.result[0].rule + 'で、ステージは、'
+                + ret.result[0].maps_ex[0].name + 'と'
+                + ret.result[0].maps_ex[1].name
+                + 'です。終了は、' + zeroSuppress(ret.result[0].end.slice(11, 13))
+                + '時です。';
+                break;
+            case 'リーグマッチ':
+                retSchedule = '現在のリーグマッチのルールは'
+                + ret.result[0].rule + 'で、ステージは、'
+                + ret.result[0].maps_ex[0].name + 'と'
+                + ret.result[0].maps_ex[1].name
+                + 'です。終了は、' + zeroSuppress(ret.result[0].end.slice(11, 13))
+                + '時です。';
+                break;
+            case 'サーモンラン':
+                var start = ret.result[0].start;
+                var end = ret.result[0].end;
+                if (!(start <= now && now <= end)) {
+                    retSchedule = '現在、サーモンランは行われていません。';
+                    break;
+                }
 
-            retSchedule = '現在のサーモンランのステージは、'
-            + ret.result[0].stage.name + 'です。終了は、'
-            + zeroSuppress(ret.result[0].end.slice(5, 7)) + '月'
-            + zeroSuppress(ret.result[0].end.slice(8, 10)) + '日'
-            + zeroSuppress(ret.result[0].end.slice(11, 13))
-            + '時です。支給ブキは、';
-            for (var i = 0; i < 4; i++) {
-                retSchedule += ret.result[0].weapons[i].name + '、';
-            }
-            retSchedule += 'です。'
-            break;
-        default:
+                retSchedule = '現在のサーモンランのステージは、'
+                + ret.result[0].stage.name + 'です。終了は、'
+                + zeroSuppress(ret.result[0].end.slice(5, 7)) + '月'
+                + zeroSuppress(ret.result[0].end.slice(8, 10)) + '日'
+                + zeroSuppress(ret.result[0].end.slice(11, 13))
+                + '時です。支給ブキは、';
+                for (var i = 0; i < 4; i++) {
+                    retSchedule += ret.result[0].weapons[i].name + '、';
+                }
+                retSchedule += 'です。'
+                break;
+            default:
+        }
+    }
+    catch (e){
+        retSchedule = "スケジュールを取得できませんでした。もう一度お試しください。";
     }
 
     return retSchedule;
@@ -142,6 +135,7 @@ function getNextSchedule(match){
     var retSchedule;
     var date = new Date();
     var now = formatDate(date, 'YYYY-MM-DDTHH:mm:ss');
+    var i;
     switch (match) {
         case 'ナワバリバトル':
             urlMatch = 'regular/next';
@@ -150,7 +144,7 @@ function getNextSchedule(match){
             urlMatch = 'gachi/next';
             break;
         case 'ガチエリア':
-        case 'ガチホコ':
+        case 'ガチホコバトル':
         case 'ガチヤグラ':
         case 'ガチアサリ':
             urlMatch = 'gachi/next_all';
@@ -168,73 +162,89 @@ function getNextSchedule(match){
         method: 'GET',
     };
 
-    let ret = JSON.parse(await(doRequest(options)));
-    switch (match) {
-        case 'ナワバリバトル':
-            retSchedule = '次のナワバリバトルのステージは、'
-            + ret.result[0].maps_ex[0].name + 'と'
-            + ret.result[0].maps_ex[1].name
-            + 'です。開始は、' + ret.result[0].start.slice(11, 13) + '時です。';
-            break;
-        case 'ガチマッチ':
-            retSchedule = '次のガチマッチのルールは'
-            + ret.result[0].rule + 'で、ステージは、'
-            + ret.result[0].maps_ex[0].name + 'と'
-            + ret.result[0].maps_ex[1].name
-            + 'です。開始は、' + ret.result[0].start.slice(11, 13) + '時です。';
-            break;
-        case 'リーグマッチ':
-            retSchedule = '次のリーグマッチのルールは'
-             + ret.result[0].rule + 'で、ステージは、'
-            + ret.result[0].maps_ex[0].name + 'と'
-             + ret.result[0].maps_ex[1].name
-            + 'です。開始は、' + ret.result[0].start.slice(11, 13) + '時です。';
-            break;
-        case 'ガチエリア':
-        case 'ガチホコ':
-        case 'ガチヤグラ':
-        case 'ガチアサリ':
-            for (var i=0;i<ret.result.length;i++) {
-                if (ret.result[i].rule == match) {
-                    retSchedule = '次の' + match + 'のステージは、'
-                    + ret.result[i].maps_ex[0].name + 'と'
-                    + ret.result[i].maps_ex[1].name
-                    + 'です。開始は、'
-                    + zeroSuppress(ret.result[i].start.slice(5, 7)) + '月'
-                    + zeroSuppress(ret.result[i].start.slice(8, 10)) + '日'
-                    + zeroSuppress(ret.result[i].start.slice(11, 13))
-                    + '時です。';
-                    break;
+    try{
+        let ret = JSON.parse(await(doRequest(options)));
+        switch (match) {
+            case 'ナワバリバトル':
+                retSchedule = '次のナワバリバトルのステージは、'
+                + ret.result[0].maps_ex[0].name + 'と'
+                + ret.result[0].maps_ex[1].name
+                + 'です。開始は、' + ret.result[0].start.slice(11, 13) + '時です。';
+                break;
+            case 'ガチマッチ':
+                retSchedule = '次のガチマッチのルールは'
+                + ret.result[0].rule + 'で、ステージは、'
+                + ret.result[0].maps_ex[0].name + 'と'
+                + ret.result[0].maps_ex[1].name
+                + 'です。開始は、' + ret.result[0].start.slice(11, 13) + '時です。';
+                break;
+            case 'リーグマッチ':
+                retSchedule = '次のリーグマッチのルールは'
+                 + ret.result[0].rule + 'で、ステージは、'
+                + ret.result[0].maps_ex[0].name + 'と'
+                 + ret.result[0].maps_ex[1].name
+                + 'です。開始は、' + ret.result[0].start.slice(11, 13) + '時です。';
+                break;
+            case 'ガチエリア':
+            case 'ガチホコバトル':
+            case 'ガチヤグラ':
+            case 'ガチアサリ':
+                for (i = 0; i < ret.result.length; i++) {
+                    if (ret.result[i].rule === match) {
+                        retSchedule = '次の' + match + 'のステージは、'
+                        + ret.result[i].maps_ex[0].name + 'と'
+                        + ret.result[i].maps_ex[1].name
+                        + 'です。開始は、'
+                        + zeroSuppress(ret.result[i].start.slice(5, 7)) + '月'
+                        + zeroSuppress(ret.result[i].start.slice(8, 10)) + '日'
+                        + zeroSuppress(ret.result[i].start.slice(11, 13))
+                        + '時です。';
+                        break;
+                    }
                 }
-            }
-            break;
-        case 'サーモンラン':
-            var start = ret.result[0].start;
-            var end = ret.result[0].end;
-            var index;
-            if (start <= now && now <= end) {
-                index = 1;
-            }
-            else {
-                index = 0;
-            }
+                break;
+            case 'サーモンラン':
+                var start = ret.result[0].start;
+                var end = ret.result[0].end;
+                var index;
+                if (start <= now && now <= end) {
+                    index = 1;
+                }
+                else {
+                    index = 0;
+                }
 
-            retSchedule = '次のサーモンランのステージは、'
-            + ret.result[index].stage.name + 'です。開始は、'
-            + zeroSuppress(ret.result[index].start.slice(5, 7)) + '月'
-            + zeroSuppress(ret.result[index].start.slice(8, 10)) + '日'
-            + zeroSuppress(ret.result[index].start.slice(11, 13))
-            + '時です。支給ブキは、';
-            for (var i = 0; i < 4; i++) {
-                retSchedule += ret.result[index].weapons[i].name + '、';
-            }
-            retSchedule += 'です。'
-            break;
-        default:
+                retSchedule = '次のサーモンランのステージは、'
+                + ret.result[index].stage.name + 'です。開始は、'
+                + zeroSuppress(ret.result[index].start.slice(5, 7)) + '月'
+                + zeroSuppress(ret.result[index].start.slice(8, 10)) + '日'
+                + zeroSuppress(ret.result[index].start.slice(11, 13))
+                + '時です。支給ブキは、';
+                for (i = 0; i < 4; i++) {
+                    retSchedule += ret.result[index].weapons[i].name + '、';
+                }
+                retSchedule += 'です。'
+                break;
+            default:
+        }
+    }
+    catch (e){
+        retSchedule = "スケジュールを取得できませんでした。もう一度お試しください。";
     }
 
     return retSchedule;
 }
+
+var formatDate = function (date, format) {
+    format = format.replace(/YYYY/g, date.getFullYear());
+    format = format.replace(/MM/g, ('0' + (date.getMonth() + 1)).slice(-2));
+    format = format.replace(/DD/g, ('0' + date.getDate()).slice(-2));
+    format = format.replace(/HH/g, ('0' + date.getHours()).slice(-2));
+    format = format.replace(/mm/g, ('0' + date.getMinutes()).slice(-2));
+    format = format.replace(/ss/g, ('0' + date.getSeconds()).slice(-2));
+    format = format.replace(/SSS/g, ('00' + date.getMilliseconds()).slice(-3));
+    return format;
+};
 
 function zeroSuppress(val) {
     return val.replace( /^0+([0-9]+)/, "$1" );
