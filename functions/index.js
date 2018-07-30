@@ -29,10 +29,19 @@ var teach = async(function teach(conv, params, input) {
             break;
         default:
             // undefinedはここにくる
-            ret = await(getNowSchedule(params.MatchName));
+            switch (params.MatchName) {
+                case 'ガチエリア':
+                case 'ガチホコバトル':
+                case 'ガチヤグラ':
+                case 'ガチアサリ':
+                    ret = await(getNextSchedule(params.MatchName));
+                    break;
+                default:
+                    ret = await(getNowSchedule(params.MatchName));
+                    break;
+            }
             break;
     }
-    ret = bukiConversion(ret);
     conv.close(ret);
 });
 
@@ -119,6 +128,7 @@ var getNowSchedule = async(function (match) {
                     retSchedule += ret.result[0].weapons[i].name + '、';
                 }
                 retSchedule += 'です。'
+                retSchedule = bukiConversion(retSchedule);
                 break;
             default:
         }
@@ -169,21 +179,24 @@ function getNextSchedule(match){
                 retSchedule = '次のナワバリバトルのステージは、'
                 + ret.result[0].maps_ex[0].name + 'と'
                 + ret.result[0].maps_ex[1].name
-                + 'です。開始は、' + ret.result[0].start.slice(11, 13) + '時です。';
+                + 'です。開始は、'
+                + zeroSuppress(ret.result[0].start.slice(11, 13)) + '時です。';
                 break;
             case 'ガチマッチ':
                 retSchedule = '次のガチマッチのルールは'
                 + ret.result[0].rule + 'で、ステージは、'
                 + ret.result[0].maps_ex[0].name + 'と'
                 + ret.result[0].maps_ex[1].name
-                + 'です。開始は、' + ret.result[0].start.slice(11, 13) + '時です。';
+                + 'です。開始は、'
+                + zeroSuppress(ret.result[0].start.slice(11, 13)) + '時です。';
                 break;
             case 'リーグマッチ':
                 retSchedule = '次のリーグマッチのルールは'
-                 + ret.result[0].rule + 'で、ステージは、'
+                + ret.result[0].rule + 'で、ステージは、'
                 + ret.result[0].maps_ex[0].name + 'と'
-                 + ret.result[0].maps_ex[1].name
-                + 'です。開始は、' + ret.result[0].start.slice(11, 13) + '時です。';
+                + ret.result[0].maps_ex[1].name
+                + 'です。開始は、'
+                + zeroSuppress(ret.result[0].start.slice(11, 13)) + '時です。';
                 break;
             case 'ガチエリア':
             case 'ガチホコバトル':
@@ -224,6 +237,7 @@ function getNextSchedule(match){
                     retSchedule += ret.result[index].weapons[i].name + '、';
                 }
                 retSchedule += 'です。'
+                retSchedule = bukiConversion(retSchedule);
                 break;
             default:
         }
