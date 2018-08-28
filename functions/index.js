@@ -42,7 +42,7 @@ var teach = async(function teach(conv, params, input) {
             }
             break;
     }
-    conv.close(ret);
+    conv.ask(ret);
 });
 
 app.intent('Teach Schedule', teach);
